@@ -72,8 +72,8 @@ def display_dataframes(forecast_length, gap, max_delay):
     earliest_features = training_dates - pd.Timedelta(days=max_delay + forecast_length + gap)
     latest_features = training_dates - pd.Timedelta(days=forecast_length + gap)
     training_dates = pd.DataFrame({"Observation Date": training_dates.strftime("%Y-%m-%d"),
-                                   f"Latest Feature Date ({max_delay + forecast_length + gap} days before)": latest_features.strftime("%Y-%m-%d"),
-                                   f"Earliest Feature Date ({forecast_length + gap} days before)": earliest_features.strftime("%Y-%m-%d")})
+                                   f"Latest Feature Date ({forecast_length + gap} days before)": latest_features.strftime("%Y-%m-%d"),
+                                   f"Earliest Feature Date ({forecast_length + gap + forecast_length} days before)": earliest_features.strftime("%Y-%m-%d")})
     training_table = dbc.Table.from_dataframe(training_dates)
 
     validation_dates = pd.date_range("2021-08-05", periods=forecast_length, freq="D") + pd.Timedelta(days=gap + 1)
@@ -81,8 +81,8 @@ def display_dataframes(forecast_length, gap, max_delay):
     latest_features = validation_dates - pd.Timedelta(days=forecast_length + gap)
 
     validation_dates = pd.DataFrame({"Observation Date": validation_dates.strftime("%Y-%m-%d"),
-                                     f"Latest Feature Date ({max_delay + forecast_length + gap} days before)": latest_features.strftime("%Y-%m-%d"),
-                                     f"Earliest Feature Date ({forecast_length + gap} days before)": earliest_features.strftime("%Y-%m-%d")})
+                                     f"Latest Feature Date ({gap + forecast_length} days before)": latest_features.strftime("%Y-%m-%d"),
+                                     f"Earliest Feature Date ({forecast_length + gap + max_delay} days before)": earliest_features.strftime("%Y-%m-%d")})
     validation_table = dbc.Table.from_dataframe(validation_dates)
 
     return [
