@@ -29,6 +29,7 @@ controls = dbc.Card(
                         {'label': "southern_oscillation_evenly_spaced", "value": "southern_oscillation_evenly_spaced"},
                         {'label': "monthly_co2", "value": "monthly_co2"},
                         {'label': "monthly-sunspots", "value": "monthly-sunspots"},
+                        {'label': "daily_bike_shares", "value": "daily_bike_shares"}
                     ],
                     value='SeoulBikeData'
                 ),
@@ -54,7 +55,8 @@ target_names = {"SeoulBikeData": "Rented Bike Count",
                 "daily-total-female-births": "Births",
                 "southern_oscillation_evenly_spaced": "oscillation",
                 "monthly_co2": "CO2",
-                "monthly-sunspots": "Sunspots"}
+                "monthly-sunspots": "Sunspots",
+                "daily_bike_shares": "cnt"}
 
 def plot_significan_lags(y, conf_level, dataset):
     acf_values, ci_intervals = stattools.acf(y, nlags=min(len(y) - 1, 400), fft=True, alpha=conf_level)
