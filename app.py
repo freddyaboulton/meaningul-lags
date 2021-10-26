@@ -13,13 +13,20 @@ from statsmodels.tsa import stattools
 app = dash.Dash(external_stylesheets=[dbc.themes.BOOTSTRAP])
 server = app.server
 
+MIN_ALPHA = 0.01
+MAX_ALPHA = 0.2
+STEP = 0.01
+slider_marks = {val: {"label": str(round(val, 3)) if i % 2 == 0 else ""} for i, val in enumerate(np.arange(MIN_ALPHA, MAX_ALPHA, step=STEP))}
+
 controls = dbc.Card(
     [
         dbc.FormGroup(
             [
                 dbc.Label("Confidence Level"),
-                dcc.Slider(id="conf-level", min=0.01,
-                           max=0.10, step=0.01, value=0.05),
+                dcc.Slider(id="conf-level", min=MIN_ALPHA,
+                           max=MAX_ALPHA, step=STEP, value=0.05,
+                           included=False,
+                           marks=slider_marks),
                 dbc.Label("Dataset"),
                 dcc.Dropdown(
                     id='dropdown',
@@ -31,7 +38,11 @@ controls = dbc.Card(
                         {'label': "monthly-sunspots", "value": "monthly-sunspots"},
                         {'label': "daily_bike_shares", "value": "daily_bike_shares"},
                         {'label': 'AirPassengers', 'value': 'AirPassengers'},
-                        {"label": "Alcohol_Sales", "value": "Alcohol_Sales"}
+                        {"label": "Alcohol_Sales", "value": "Alcohol_Sales"},
+                        {"label": "yahoo_stock", "value": "yahoo_stock"},
+                        {"label": "Miles_Traveled", "value": "Miles_Traveled"},
+                        {"label": "DailyDelhiClimateTrain", "value": "DailyDelhiClimateTrain"},
+                        {"label": "peyton_manning", "value": "peyton_manning"}
                     ],
                     value='SeoulBikeData'
                 ),
@@ -60,7 +71,11 @@ target_names = {"SeoulBikeData": "Rented Bike Count",
                 "monthly-sunspots": "Sunspots",
                 "daily_bike_shares": "cnt",
                 "AirPassengers": "#Passengers",
-                "Alcohol_Sales": "S4248SM144NCEN"}
+                "Alcohol_Sales": "S4248SM144NCEN",
+                "yahoo_stock": "Adj Close",
+                "Miles_Traveled": "TRFVOLUSM227NFWA",
+                "DailyDelhiClimateTrain": "meantemp",
+                "peyton_manning": "y"}
 
 def plot_significan_lags(y, conf_level, dataset):
     acf_values, ci_intervals = stattools.acf(y, nlags=min(len(y) - 1, 400), fft=True, alpha=conf_level)
@@ -88,9 +103,9 @@ def plot_significan_lags(y, conf_level, dataset):
                               line_color='blue', opacity=0.1))
     fig1.add_trace(go.Scatter(x=np.arange(len(acf_values)), y=ci_intervals[:, 1] - acf_values,
                               line_color='blue', opacity=0.1, fill='tonexty'))
-    fig1.update_yaxes(range=[min(-0.2, min(acf_values)) - 0.1, 1.1])
+    fig1.update_yaxes(range=[min(-0.2, min(acf_values), min(ci_intervals[:, 0])) - 0.1, 1.1])
     fig1.update_layout(showlegend=False,
-                      title_text=f"{dataset}<br>Statistically significant lags:<br> {significant_lags}")
+                      title_text=f"{dataset}<br>Statistically significant lags for a {int((1 - conf_level) * 100)}% confidence interval:<br> {significant_lags}")
     return fig1
 
 
